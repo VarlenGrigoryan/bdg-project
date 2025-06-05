@@ -22,7 +22,7 @@ jobs:
         run: docker build -t varlens-backend ./backend
 
       - name: Scan varlens-frontend with Trivy
-        uses: aquasecurity/trivy-action@v0.12.0
+        uses: aquasecurity/trivy-action@0.11.2
         with:
           scan-type: image
           image-ref: varlens-frontend
@@ -30,11 +30,12 @@ jobs:
           severity: CRITICAL,HIGH
 
       - name: Scan varlens-backend with Trivy
-        uses: aquasecurity/trivy-action@v0.12.0
+        uses: aquasecurity/trivy-action@0.11.2
         with:
           scan-type: image
           image-ref: varlens-backend
           format: table
           severity: CRITICAL,HIGH
+
 
 
