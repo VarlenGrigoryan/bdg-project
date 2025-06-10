@@ -70,11 +70,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        working-directory: ./terraform
+        working-directory: ./bdg-project/terraform
         run: terraform init
 
       - name: Terraform Apply
-        working-directory: ./terraform
+        working-directory: ./bdg-project/terraform
         run: terraform apply -auto-approve
 
 
