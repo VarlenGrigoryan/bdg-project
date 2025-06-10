@@ -7,3 +7,10 @@ npm-debug.log
 *.sublime-workspace
 .vs
 terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/.terraform.lock.hcl
+backend/node_modules/
+frontend/node_modules/
+*.log
+.DS_Store
