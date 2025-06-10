@@ -1,0 +1,81 @@
+name: Trivy Image Scan and Deploy
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  trivy-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to AWS ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
+          docker login --username AWS --password-stdin ${{ secrets.ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+      - name: Build varlens-frontend image
+        run: docker build -t varlens-frontend ./frontend
+
+      - name: Build varlens-backend image
+        run: docker build -t varlens-backend ./backend
+
+      - name: Scan varlens-frontend with Trivy
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          scan-type: image
+          image-ref: varlens-frontend
+          format: table
+          severity: CRITICAL,HIGH
+
+      - name: Scan varlens-backend with Trivy
+        uses: aquasecurity/trivy-action@0.11.2
+        with:
+          scan-type: image
+          image-ref: varlens-backend
+          format: table
+          severity: CRITICAL,HIGH
+
+      - name: Tag varlens-frontend image for ECR
+        run: |
+          docker tag varlens-frontend ${{ secrets.ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/varlens-frontend:latest
+
+      - name: Tag varlens-backend image for ECR
+        run: |
+          docker tag varlens-backend ${{ secrets.ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/varlens-backend:latest
+
+      - name: Push varlens-frontend image to ECR
+        run: |
+          docker push ${{ secrets.ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/varlens-frontend:latest
+
+      - name: Push varlens-backend image to ECR
+        run: |
+          docker push ${{ secrets.ECR_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/varlens-backend:latest
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: ./terraform
+        run: terraform init
+
+      - name: Terraform Apply
+        working-directory: ./terraform
+        run: terraform apply -auto-approve
+
+
+
