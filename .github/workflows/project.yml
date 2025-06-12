@@ -1,4 +1,4 @@
-name: Trivy Image Scan and Deploy
+name: Trivy Scan, Terraform Deploy & Ansible Configure
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  trivy-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -73,6 +73,20 @@ jobs:
         working-directory: ./terraform
         run: terraform init
 
+      - name: Terraform Apply
+        working-directory: ./terraform
+        run: terraform apply -auto-approve
+
+      - name: Get EC2 Public IP from Terraform output
+        id: ec2ip
+        working-directory: ./terraform
+        run: echo "PUBLIC_IP=$(terraform output -raw ec2_public_ip)" >> $GITHUB_ENV
+
+      - name: Create dynamic Ansible inventory
+        run: |
+          echo "[ec2]" > ansible/hosts.ini
+          echo "$PUBLIC_IP ansible_user=ubuntu ansible_ssh_private_key_file=./ansible/id_rsa" >> ansible/hosts.ini
+
       - name: Set up Python and install Ansible
         run: |
           python -m pip install --upgrade pip
@@ -85,9 +99,5 @@ jobs:
 
       - name: Run Ansible playbook
         run: |
-          ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yml --ssh-extra-args='-o StrictHostKeyChecking=no'
-  
+          ansible-playbook -i ansible/hosts.ini ansible/playbook.yml --ssh-extra-args='-o StrictHostKeyChecking=no'
 
-      - name: Terraform Apply
-        working-directory: ./terraform
-        run: terraform apply -auto-approve
