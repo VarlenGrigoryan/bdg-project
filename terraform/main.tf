@@ -23,9 +23,15 @@ data "aws_subnet" "default" {
 }
 }
 
+resource "aws_key_pair" "deployer" {
+  key_name   = "deployer-key"
+  public_key = file("~/.ssh/id_rsa.pub")
+}
+
 resource "aws_instance" "web" {
   ami           = "ami-0286d0aea4d6c7a34"
   instance_type = "t2.micro"
+  key_name      = aws_key_pair.deployer.key_name
   subnet_id     = data.aws_subnet.default.id
   tags = {
     Name = "varlens-web-instance"
