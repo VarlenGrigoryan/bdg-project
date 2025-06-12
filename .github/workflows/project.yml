@@ -73,6 +73,21 @@ jobs:
         working-directory: ./terraform
         run: terraform init
 
+      - name: Set up Python and install Ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible
+
+      - name: Add SSH key to ssh-agent
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Run Ansible playbook
+        run: |
+          ansible-playbook -i ./ansible/hosts.ini ./ansible/playbook.yml --ssh-extra-args='-o StrictHostKeyChecking=no'
+  
+
       - name: Terraform Apply
         working-directory: ./terraform
         run: terraform apply -auto-approve
