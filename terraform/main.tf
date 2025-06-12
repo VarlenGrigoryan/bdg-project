@@ -24,7 +24,7 @@ data "aws_subnet" "default" {
 }
 
 resource "aws_instance" "web" {
-  ami           = "ami-0faab6bdbac9486fb"
+  ami           = "ami-0286d0aea4d6c7a34"
   instance_type = "t2.micro"
   subnet_id     = data.aws_subnet.default.id
   tags = {
