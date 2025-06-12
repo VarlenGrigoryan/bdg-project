@@ -19,13 +19,13 @@ data "aws_subnet" "default" {
 
   filter {
     name   = "availability-zone"
-    values = ["eu-west-1b"]  # Adjust to a valid AZ if needed
+    values = ["eu-west-1b"]  
 }
 }
 
 resource "aws_key_pair" "deployer" {
   key_name   = "deployer-key"
-  public_key = file("/home/varlen/.ssh/id_rsa.pub")
+  public_key = file("${path.module}/bdg-key.pub")
 }
 
 resource "aws_instance" "web" {
