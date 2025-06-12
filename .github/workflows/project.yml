@@ -97,6 +97,11 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
+      - name: Setup SSH private key
+        run: |
+          echo "${{ secrets.DEPLOYER_KEY_PRIVATE }}" > ~/.ssh/bdg-key
+          chmod 600 ~/.ssh/bdg-key
+      
       - name: Run Ansible playbook
         run: |
           ansible-playbook -i ansible/hosts.ini ansible/playbook.yml --ssh-extra-args='-o StrictHostKeyChecking=no'
