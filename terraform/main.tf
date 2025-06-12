@@ -32,3 +32,11 @@ resource "aws_instance" "web" {
   }
 }
 
+terraform {
+  backend "s3" {
+    bucket = "varlens-terraform-bucket"
+    region = "eu-west-1"
+  }
+}
+
+
