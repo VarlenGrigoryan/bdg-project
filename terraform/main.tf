@@ -35,6 +35,7 @@ resource "aws_instance" "web" {
 terraform {
   backend "s3" {
     bucket = "varlens-terraform-bucket"
+    key    = "terraform.tfstate"
     region = "eu-west-1"
   }
 }
