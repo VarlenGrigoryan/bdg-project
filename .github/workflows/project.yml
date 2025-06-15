@@ -85,7 +85,8 @@ jobs:
       - name: Create dynamic Ansible inventory
         run: |
           echo "[ec2]" > ansible/hosts.ini
-          echo "$PUBLIC_IP ansible_user=ubuntu ansible_ssh_private_key_file=./ansible/bdg-key.pem" >> ansible/hosts.ini
+          echo "$PUBLIC_IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/bdg-key" >> ansible/hosts.ini
+
       
       - name: Set up Python and install Ansible
         run: |
@@ -99,8 +100,9 @@ jobs:
 
       - name: Setup SSH private key
         run: |
-          echo "${{ secrets.DEPLOYER_KEY_PRIVATE }}" > ./ansible/bdg-key.pem
-          chmod 600 ./ansible/bdg-key.pem
+          echo "${{ secrets.DEPLOYER_KEY_PRIVATE }}" > ~/.ssh/bdg-key
+          chmod 600 ~/.ssh/bdg-key
+
 
       
       - name: Run Ansible playbook
