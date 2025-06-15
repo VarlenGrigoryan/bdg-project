@@ -25,7 +25,7 @@ data "aws_subnet" "default" {
 
 resource "aws_key_pair" "deployer" {
   key_name   = "deployer-key"
-  public_key = file("~/.ssh/bdg-key.pub")
+  public_key = file("${path.module}/bdg-key.pub")
 }
 
 resource "aws_instance" "web" {
