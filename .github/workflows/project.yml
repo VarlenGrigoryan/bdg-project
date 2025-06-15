@@ -96,14 +96,12 @@ jobs:
       - name: Add SSH key to ssh-agent
         uses: webfactory/ssh-agent@v0.8.0
         with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          ssh-private-key: ${{ secrets.DEPLOYER_KEY_PRIVATE }}
 
       - name: Setup SSH private key
         run: |
           echo "${{ secrets.DEPLOYER_KEY_PRIVATE }}" > ~/.ssh/bdg-key
           chmod 600 ~/.ssh/bdg-key
-
-
 
       
       - name: Run Ansible playbook
