@@ -10,6 +10,16 @@
     dest: /usr/local/bin/docker-compose
     mode: '0755'
 
+- name: Login to AWS ECR
+  shell: |
+    aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 704274790393.dkr.ecr.eu-west-1.amazonaws.com
+
+- name: Install AWS CLI
+  apt:
+    name: awscli
+    state: present
+    update_cache: yes
+
 - name: Copy docker-compose file
   copy:
     src: docker-compose.yml
