@@ -10,15 +10,32 @@
     dest: /usr/local/bin/docker-compose
     mode: '0755'
 
+- name: Install unzip (dependency for AWS CLI)
+  apt:
+    name: unzip
+    state: present
+    update_cache: yes
+
+- name: Download AWS CLI v2 installer
+  get_url:
+    url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+    dest: /tmp/awscliv2.zip
+    mode: '0644'
+
+- name: Unzip AWS CLI installer
+  unarchive:
+    src: /tmp/awscliv2.zip
+    dest: /tmp
+    remote_src: yes
+
+- name: Install AWS CLI v2
+  command: /tmp/aws/install --update
+  args:
+    creates: /usr/local/bin/aws
+
 - name: Login to AWS ECR
   shell: |
     aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 704274790393.dkr.ecr.eu-west-1.amazonaws.com
-
-- name: Install AWS CLI
-  apt:
-    name: awscli
-    state: present
-    update_cache: yes
 
 - name: Copy docker-compose file
   copy:
