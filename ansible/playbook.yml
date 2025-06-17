@@ -1,12 +1,6 @@
-- name: Configure EC2 instance
+- name: Deploy Web App with Docker Compose
   hosts: ec2
   become: yes
-  tasks:
-    - name: Update apt cache
-      apt:
-        update_cache: yes
+  roles:
+    - deploy_app
 
-    - name: Install nginx
-      apt:
-        name: nginx
-        state: present
